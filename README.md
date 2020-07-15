@@ -21,3 +21,7 @@ To use your GitHub user credentials, add the following:
 }
 ```
 
+#### Dependencies
+This script uses [PyGithub](https://github.com/PyGithub/PyGithub)
+
+Install PyGithub by running `$ pip install PyGithub`
