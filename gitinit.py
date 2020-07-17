@@ -4,6 +4,23 @@ from pathlib import Path
 import os
 import json
 
+def create_config():
+    credentials = {}
+    print("Do you want to use credentials or a token for authorization? ")
+    auth_type = input("(c)redentials/(t)oken: ")
+    if auth_type.lower() == 'c' or auth_type.lower() == 'credentials':
+        credentials['user'] = input("username: ")
+        credentials['password'] = input("password: ")
+    else:
+        credentials['token'] = input("token: ")
+
+    path = str(Path(__file__).parent.absolute()) + '/config.json'
+    configFile = Path(path)
+    if configFile.is_file() is not True:
+        f = open(path, 'w')
+        print(json.dumps(credentials))
+        f.write(json.dumps(credentials))
+
 def getUser(token='', user='', password=''):
     if token != '':
         github = Github(token)
@@ -11,7 +28,7 @@ def getUser(token='', user='', password=''):
         github = Github(user, password)
     return github.get_user()
 
-def createRepo(user):
+def create_repo(user):
     repo_name = input("Name of the repository: ")
     repo_desc = input("Description of the repository: ")
 
@@ -20,7 +37,8 @@ def createRepo(user):
 
     repository = user.create_repo(repo_name, repo_desc, private=is_repo_private)
     return { "ssh": repository.ssh_url, "html": repository.html_url }
-def initializeRepo(ssh_url):
+
+def initialize_repo(ssh_url):
     os.system('echo "Initialize repository"')
     os.system('git init')
     os.system('echo "Remote origin"')
@@ -32,7 +50,7 @@ def initializeRepo(ssh_url):
     os.system('echo "Push Folder"')
     os.system('git push -u origin master')
 
-def run():
+def get_authorization():
     path = str(Path(__file__).parent.absolute())
     with open(path + '/config.json', 'r') as config_file:
         data = json.load(config_file)
@@ -43,7 +61,13 @@ def run():
         else:
             auth_token = data["token"]
             user = getUser(token=auth_token)
+        return user
 
-    repo = createRepo(user)
-    initializeRepo(repo["ssh"])
+
+
+def run():
+    create_config()
+    user = get_authorization()
+    repo = create_repo(user)
+    initialize_repo(repo["ssh"])
     print("Visit your newly create repository at: " + repo["html"])
