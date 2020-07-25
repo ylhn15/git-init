@@ -3,22 +3,22 @@ from github import Github
 from pathlib import Path
 import os
 import json
+from getpass import getpass
 
 def create_config():
     credentials = {}
-    print("Do you want to use credentials or a token for authorization? ")
-    auth_type = input("(c)redentials/(t)oken: ")
-    if auth_type.lower() == 'c' or auth_type.lower() == 'credentials':
-        credentials['user'] = input("username: ")
-        credentials['password'] = input("password: ")
-    else:
-        credentials['token'] = input("token: ")
-
     path = str(Path(__file__).parent.absolute()) + '/config.json'
-    configFile = Path(path)
-    if configFile.is_file() is not True:
+    config_file = Path(path)
+    if config_file.is_file() is not True:
+        print("Do you want to use credentials or a token for authorization? ")
+        auth_type = input("(c)redentials/(t)oken: ")
+        if auth_type.lower() == 'c' or auth_type.lower() == 'credentials':
+            credentials['user'] = input("username: ")
+            credentials['password'] = getpass()
+        else:
+            credentials['token'] = input("token: ")
+
         f = open(path, 'w')
-        print(json.dumps(credentials))
         f.write(json.dumps(credentials))
 
 def getUser(token='', user='', password=''):
@@ -39,6 +39,7 @@ def create_repo(user):
     return { "ssh": repository.ssh_url, "html": repository.html_url }
 
 def initialize_repo(ssh_url):
+    os.system('echo "# README" >> README.md')
     os.system('echo "Initialize repository"')
     os.system('git init')
     os.system('echo "Remote origin"')
@@ -48,7 +49,7 @@ def initialize_repo(ssh_url):
     os.system('echo "Writing initial commit"')
     os.system('git commit -m "Initial commit"')
     os.system('echo "Push Folder"')
-    os.system('git push -u origin master')
+    os.system('git push --set-upstream origin master')
 
 def get_authorization():
     path = str(Path(__file__).parent.absolute())
