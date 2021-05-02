@@ -39,7 +39,7 @@ def create_repo(user):
     is_repo_private = is_repo_private.lower() == "y"
 
     repository = user.create_repo(repo_name, repo_desc,
-            private=is_repo_private)
+                 private=is_repo_private)
     return {
             "ssh": repository.ssh_url,
             "html": repository.html_url,
@@ -79,5 +79,5 @@ def run():
     create_config()
     user = get_authorization()
     repo = create_repo(user)
-    initialize_repo(repo["ssh"])
+    initialize_repo(repo["ssh"], repo["repo_name"])
     print("Visit your newly create repository at: " + repo["html"])
