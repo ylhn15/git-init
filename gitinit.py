@@ -32,6 +32,8 @@ def getUser(token='', user='', password=''):
 
 
 def create_repo(user):
+    repo_name = ""
+    repo_desc = ""
     repo_name = input("Name of the repository: ")
     repo_desc = input("Description of the repository: ")
 
@@ -58,7 +60,7 @@ def initialize_repo(ssh_url, repo_name):
     os.system('echo "Writing initial commit"')
     os.system('git commit -m "Initial commit"')
     os.system('echo "Push Folder"')
-    os.system('git push --set-upstream origin main')
+    os.system('git push --set-upstream origin master')
 
 
 def get_authorization():
@@ -81,3 +83,7 @@ def run():
     repo = create_repo(user)
     initialize_repo(repo["ssh"], repo["repo_name"])
     print("Visit your newly create repository at: " + repo["html"])
+    
+if __name__ == '__main__':
+    run()
+
