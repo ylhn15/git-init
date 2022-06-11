@@ -5,6 +5,17 @@ from pathlib import Path
 from getpass import getpass
 from github import Github
 
+def check_git_config():
+    path = str(Path.home()) + '/.gitconfig'
+    git_config_file = Path(path)
+    if git_config_file.is_file() is not True:
+        print('No git config found, running setup')
+        email = input('Enter email address you want to use for git: ')
+        os.system('git config --global user.email ' + email)
+        name = input('Enter your name or alias: ')
+        os.system('git config --global user.name ' + name)
+        initial_branch_name = input('Enter initial branch name: ')
+        os.system('git config --global init.defaultBranch ' + initial_branch_name)
 
 def create_config():
     credentials = {}
@@ -78,8 +89,9 @@ def get_authorization():
 
 
 def run():
-    create_config()
+    check_git_config()
     user = get_authorization()
+    create_config()
     repo = create_repo(user)
     initialize_repo(repo["ssh"], repo["repo_name"])
     print("Visit your newly create repository at: " + repo["html"])
