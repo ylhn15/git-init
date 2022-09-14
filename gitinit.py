@@ -33,18 +33,17 @@ def create_config():
         f = open(path, 'w')
         f.write(json.dumps(credentials))
 
+def init_github(token='', user='', password=''):
+    if token != '':
+        return Github(token)
+    else:
+        return Github(user, password)
 
 def getUser(token='', user='', password=''):
-    if token != '':
-        github = Github(token)
-    else:
-        github = Github(user, password)
-    return github.get_user()
+    return init_github(token, user, password).get_user()
 
 
 def create_repo(user):
-    repo_name = ""
-    repo_desc = ""
     repo_name = input("Name of the repository: ")
     repo_desc = input("Description of the repository: ")
 
@@ -61,7 +60,8 @@ def create_repo(user):
 
 
 def initialize_repo(ssh_url, repo_name):
-    os.system('echo "# "' + repo_name + ' >> README.md')
+    os.system('echo "# "' + repo_name + ' > README.md')
+    os.system('touch .gitignore')
     os.system('echo "Initialize repository"')
     os.system('git init')
     os.system('echo "Remote origin"')
