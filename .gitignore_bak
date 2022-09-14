@@ -1,0 +1,4 @@
+config.json
+build/
+.prettierrc
+__pycache__

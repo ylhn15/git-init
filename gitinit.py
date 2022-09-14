@@ -33,24 +33,24 @@ def create_config():
         f = open(path, 'w')
         f.write(json.dumps(credentials))
 
-def init_github(token='', user='', password=''):
-    if token != '':
-        return Github(token)
-    else:
-        return Github(user, password)
-
-def getUser(token='', user='', password=''):
-    return init_github(token, user, password).get_user()
-
-
-def create_repo(user):
+def create_repo(github):
     repo_name = input("Name of the repository: ")
     repo_desc = input("Description of the repository: ")
 
     is_repo_private = input("Create a private repo? (y/N): ")
     is_repo_private = is_repo_private.lower() == "y"
 
-    repository = user.create_repo(repo_name, repo_desc,
+    should_create_gitignore = input("Create gitignore? (y/N): ")
+    if should_create_gitignore.lower() == "y":
+        template = input("For what language do you want to generate a gitignore?: ")
+        available_templates = github.get_gitignore_templates()
+        if template not in available_templates:
+            print("No template for the specified language found")
+            return
+        gitignore = github.get_gitignore_template(template).source
+        os.system('echo "'+ str(gitignore) + '" > .gitignore')
+
+    repository = github.get_user().create_repo(repo_name, repo_desc,
                  private=is_repo_private)
     return {
             "ssh": repository.ssh_url,
@@ -61,7 +61,6 @@ def create_repo(user):
 
 def initialize_repo(ssh_url, repo_name):
     os.system('echo "# "' + repo_name + ' > README.md')
-    os.system('touch .gitignore')
     os.system('echo "Initialize repository"')
     os.system('git init')
     os.system('echo "Remote origin"')
@@ -73,6 +72,15 @@ def initialize_repo(ssh_url, repo_name):
     os.system('echo "Push Folder"')
     os.system('git push --set-upstream origin master')
 
+
+def init_github():
+    path = str(Path(__file__).parent.absolute())
+    with open(path + '/config.json', 'r') as config_file:
+        data = json.load(config_file)
+        if 'token' not in data:
+            return Github(data["user"], data["password"])
+        else:
+            return Github(data["token"])
 
 def get_authorization():
     path = str(Path(__file__).parent.absolute())
@@ -89,10 +97,10 @@ def get_authorization():
 
 
 def run():
+    github = init_github()
     check_git_config()
-    user = get_authorization()
     create_config()
-    repo = create_repo(user)
+    repo = create_repo(github)
     initialize_repo(repo["ssh"], repo["repo_name"])
     print("Visit your newly create repository at: " + repo["html"])
     
