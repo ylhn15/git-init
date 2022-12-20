@@ -97,13 +97,9 @@ def get_authorization():
 
 
 def run():
-    github = init_github()
     check_git_config()
     create_config()
+    github = init_github()
     repo = create_repo(github)
     initialize_repo(repo["ssh"], repo["repo_name"])
     print("Visit your newly create repository at: " + repo["html"])
-    
-if __name__ == '__main__':
-    run()
-
